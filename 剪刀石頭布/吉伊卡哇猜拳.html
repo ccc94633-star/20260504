@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>吉伊卡哇猜拳遊戲</title>
+    <link rel="stylesheet" href="吉伊卡哇猜拳.css">
+</head>
+
+<body>
+
+    <h1>✦ 猜拳遊戲 ✦</h1>
+    <p class="subtitle">吉伊卡哇也想贏！(๑˃ᴗ˂)ﻭ</p>
+
+    <div class="game-area">
+        <!-- 玩家 -->
+        <div class="panel">
+            <div class="panel-title">玩家</div>
+            <div class="avatar"><img src="./img/Usagii-2.gif" alt=""></div>
+            <div class="choice-display" id="player-display">❓</div>
+            <div class="choices">
+                <label>
+                    <input type="radio" name="player-choice" value="石頭">
+                    <div class="choice-btn">✊<span>石頭</span></div>
+                </label>
+                <label>
+                    <input type="radio" name="player-choice" value="剪刀">
+                    <div class="choice-btn">✌️<span>剪刀</span></div>
+                </label>
+                <label>
+                    <input type="radio" name="player-choice" value="布">
+                    <div class="choice-btn">🖐<span>布</span></div>
+                </label>
+            </div>
+        </div>
+
+        <!-- 中間 -->
+        <div class="center">
+            <div class="vs-badge">VS</div>
+            <button type="button" id="play-btn">出拳！</button>
+            <div class="result-badge" id="result-badge">—</div>
+        </div>
+
+        <!-- 電腦 -->
+        <div class="panel">
+            <div class="panel-title">電腦</div>
+            <div class="avatar"><img src="./img/chii.gif" alt=""></div>
+            <div class="choice-display" id="computer-display">❓</div>
+        </div>
+    </div>
+
+    <!-- 計分板 -->
+    <div class="scoreboard">
+        <div class="score-item">
+            <span class="score-label">🐭 玩家贏</span>
+            <span class="score-num" id="player-score">0</span>
+        </div>
+        <div class="score-item">
+            <span class="score-label">🤝 平手</span>
+            <span class="score-num" id="draw-score">0</span>
+        </div>
+        <div class="score-item">
+            <span class="score-label">🐱 電腦贏</span>
+            <span class="score-num" id="computer-score">0</span>
+        </div>
+    </div>
+
+    <!-- 歷史紀錄 -->
+    <div class="history-wrap">
+        <div class="history-title">📜 對戰紀錄</div>
+        <textarea id="total" readonly placeholder="快來出拳吧～"></textarea>
+    </div>
+
+    <script>
+
+        const playbtn = document.querySelector("#play-btn");
+        
+        //先讓雙方累積贏的次數歸零
+        let playerWinCount = 0;
+        let computerWinCount = 0;
+        let drawCount = 0;
+
+        const emojiMap = { '石頭': '✊', '剪刀': '✌️', '布': '🖐' };
+
+        // 註冊playbtn的點擊事件：
+        playbtn.addEventListener('click', () => {
+
+            // 從player-choice裡被按的input取出，成為selected此元素
+            const selected = document.querySelector('input[name="player-choice"]:checked');
+
+            // 檢查沒出拳就return
+            if (selected === null) {
+                alert('請先選擇出拳！(｡•́︿•̀｡)');
+                return;
+            }
+            // 透過selected的值，使用playGame的方法玩一局
+            playGame(selected.value);
+        });
+
+        // 電腦出拳的方法
+        function getComputerChoice() {
+
+            // 先宣告choices為陣列石頭(0)剪刀(1)布(2)
+            const choices = ['石頭', '剪刀', '布'];
+            // 使用數學方法 隨機return出0,1,2三個數字
+            return choices[Math.floor(Math.random() * choices.length)];
+        }
+
+        //判斷輸贏的方法
+        function judge(player, computer) {
+            if (player === computer) return '平手';
+            if (
+                (player === '石頭' && computer === '剪刀') ||
+                (player === '剪刀' && computer === '布') ||
+                (player === '布' && computer === '石頭')
+            ) return '玩家贏';
+            else return '電腦贏';
+        }
+
+        // 玩一局的方法
+        function playGame(player) {
+
+            // 宣告computer為:使用電腦出拳的方法得出的結果
+            const computer = getComputerChoice();
+            // 宣告result為:使用judge的方法比較player跟computer兩個變數的輸贏結果
+            const result = judge(player, computer);
+
+            // 更新出拳顯示 + 彈跳動畫
+            const pd = document.querySelector('#player-display');
+            const cd = document.querySelector('#computer-display');
+            pd.textContent = emojiMap[player];
+            cd.textContent = emojiMap[computer];
+            pd.classList.remove('pop');
+            cd.classList.remove('pop');
+            void pd.offsetWidth;
+            pd.classList.add('pop');
+            cd.classList.add('pop');
+
+            // 更新記分板的結果
+            const badge = document.querySelector('#result-badge');
+            
+            // 先清掉舊的結果樣式（win/lose/draw），重設為基本 class
+            badge.className = 'result-badge';
+            if (result === '玩家贏') {
+                badge.textContent = '🎉 玩家贏！';
+                // 加上對應的 CSS class
+                badge.classList.add('win');
+                // 計數器加一
+                playerWinCount++;
+                // 把新分數更新到畫面上的計分欄
+                document.querySelector('#player-score').textContent = playerWinCount;
+            
+            } else if (result === '電腦贏') {
+                badge.textContent = '😿 電腦贏！';
+                badge.classList.add('lose');
+                computerWinCount++;
+                document.querySelector('#computer-score').textContent = computerWinCount;
+            
+            } else {
+                badge.textContent = '🤝 平手！';
+                badge.classList.add('draw');
+                drawCount++;
+                document.querySelector('#draw-score').textContent = drawCount;
+            }
+
+            // 寫入紀錄
+            const total = document.querySelector("#total");
+            total.value += `玩家: ${player} 電腦: ${computer} 結果: ${result} 玩家贏次數: ${playerWinCount} 電腦贏次數: ${computerWinCount}\n`;
+
+
+            //把 scrollTop 設為 scrollHeight，就是把捲動條拉到最底，效果像聊天室每次新訊息出現時自動往下捲。
+            total.scrollTop = total.scrollHeight;
+        }
+    </script>
+
+</body>
+
+</html>

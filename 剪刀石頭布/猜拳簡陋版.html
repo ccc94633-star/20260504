@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>吉伊卡哇猜拳遊戲</title>
+</head>
+
+<body>
+    <div class="left-bar">
+        <label><input type="radio" name="player-choice" value="石頭"> 石頭</label>
+        <label><input type="radio" name="player-choice" value="剪刀"> 剪刀</label>
+        <label><input type="radio" name="player-choice" value="布"> 布</label>
+        <div class="judge">
+            <div class="tatal"></div>
+        </div>
+    </div>
+    <button type="button" id="play-btn">剪刀石頭布</button type="button">
+    <div class="right-bar">
+        <div class="judge">
+            <div class="tatal"></div>
+        </div>
+    </div>
+    <textarea id="total" rows="100" cols="100"></textarea>
+
+
+    <script>
+
+        const playbtn = document.querySelector("#play-btn");
+        const leftbar = document.querySelector("#left-bar");
+        const rightbar = document.querySelector("#right-bar");
+        let playerWinCount = 0;
+        let computerWinCount = 0;
+
+
+        playbtn.addEventListener('click', () => {
+            // FIXME: 取得玩家出拳
+            const player = document.querySelector('input[name="player-choice"]:checked').value;
+            console.log('player: ', player);
+            playGame(player);
+        })
+
+        //電腦出拳
+        function getComputerChoice() {
+            const choices = ['石頭', '剪刀', '布'];
+            const index = Math.floor(Math.random() * choices.length);
+            return choices[index];
+        }
+
+        /*
+         * 判斷輸贏
+         * 方法名稱: judge
+         * 方法參數 player: 玩家出的拳頭
+         * 方法參數 computer: 電腦出的拳頭
+         */
+        function judge(player, computer) {
+            let result = '';
+            if (player === computer) {
+                result = '平手';
+            }
+            else if (
+                (player === '石頭' && computer === '剪刀') ||
+                (player === '剪刀' && computer === '布') ||
+                (player === '布' && computer === '石頭')
+            ) {
+                result = '玩家贏';
+            }
+            else {
+                result = '電腦贏';
+            }
+
+            // 記錄連勝次數
+            if (result === '玩家贏') {
+                // 累計玩家贏次數
+                playerWinCount++;
+            }
+            if (result === '電腦贏') {
+                // 累計玩家贏次數
+                computerWinCount++;
+            }
+
+            const total = document.querySelector("#total");
+            total.value += `玩家出拳: ${player} | 電腦出拳: ${computer} | 猜拳結果: ${result} |玩家贏次數: ${playerWinCount} | 電腦贏次數: ${computerWinCount}\n`;
+
+        }
+
+        /*
+        function 方法名稱A(參數1, 參數2) {
+            計算
+            return 回傳值;
+        }
+
+        fucntion getName(){
+            return "雯雯";
+        }
+
+        let name = getName();
+        let name = "雯雯";
+
+        如何使用(呼叫)方法
+        方法名稱A(參數1, 參數2);
+
+        宣告變數
+        */
+
+        /*
+         * 方法名稱: playerGame
+         * 方法參數 player: 玩家出的拳頭
+         */
+        function playGame(player) {
+            // 幫電腦出拳: 呼叫 getComputerChioce()
+            let computer = getComputerChoice(); // 石頭
+
+            // 判斷輸贏: 呼叫 judge 方法 帶入 player的拳頭 跟 computer的拳頭
+            judge(player, computer);
+        }
+
+    </script>
+
+
+</body>
+
+</html>
